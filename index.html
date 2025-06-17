@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MolGPT - Molecular Generation Platform</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <!-- Main Application Container -->
+    <main class="app">
+        <div class="app__panel">
+            
+            <!-- Left Panel: Controls and Configuration -->
+            <section class="app__left-panel">
+                
+                <!-- Application Header -->
+                <header class="header">
+                    <div class="header__logo">
+                        <img src="svg and png files/blur-circular.png" alt="MolGPT Logo" class="header__logo-image">
+                        <h1 class="header__title">MolGPT</h1>
+                    </div>
+                </header>
+
+                <!-- Mode Selection Dropdown -->
+                <div class="mode-selector" data-component="mode-selector">
+                    <button class="mode-selector__trigger" aria-haspopup="true" aria-expanded="false">
+                        <img src="svg and png files/dropmenu.svg" alt="" class="mode-selector__menu-icon" aria-hidden="true">
+                        <span class="mode-selector__current-text">Select Mode</span>
+                        <img src="svg and png files/droparrow.svg" alt="" class="mode-selector__arrow" aria-hidden="true">
+                    </button>
+                    
+                    <ul class="mode-selector__menu" role="menu">
+                        <li role="menuitem">
+                            <button class="mode-selector__option" data-mode="De Novo Generation">
+                                De Novo Generation
+                            </button>
+                        </li>
+                        <li role="menuitem">
+                            <button class="mode-selector__option" data-mode="Scaffold Decoration">
+                                Scaffold Decoration
+                            </button>
+                        </li>
+                        <li role="menuitem">
+                            <button class="mode-selector__option" data-mode="Fragment Linking">
+                                Fragment Linking
+                            </button>
+                        </li>
+                        <li role="menuitem">
+                            <button class="mode-selector__option" data-mode="Molecular Transformation">
+                                Molecular Transformation
+                            </button>
+                        </li>
+                        <li role="menuitem">
+                            <button class="mode-selector__option" data-mode="Peptide Design">
+                                Peptide Design
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Mode Configuration Panel -->
+                <section class="mode-config" data-component="mode-config">
+                    
+                    <!-- Fixed-size mode zone container -->
+                    <div class="mode-config__content">
+                        
+                        <!-- Mode Instructions Display -->
+                        <div class="mode-instructions" data-element="mode-instructions">
+                            <!-- Dynamic content injected here -->
+                        </div>
+                        
+                        <!-- Mode-specific Input Forms Container -->
+                        <div class="mode-forms" data-element="mode-forms">
+                            
+                            <!-- Scaffold Decoration Form (initially hidden) -->
+                            <form class="mode-form mode-form--scaffold" data-mode-form="Scaffold Decoration">
+                                <div class="input-group">
+                                    <label for="scaffold-smiles" class="input-group__label">Scaffold SMILES</label>
+                                    <input 
+                                        type="text" 
+                                        id="scaffold-smiles" 
+                                        class="input-group__input"
+                                        placeholder="e.g. C1CCCCC1"
+                                        data-input="scaffold-smiles"
+                                    >
+                                </div>
+                                
+                                <div class="file-upload">
+                                    <input 
+                                        type="file" 
+                                        id="scaffold-file" 
+                                        class="file-upload__input"
+                                        accept=".smi"
+                                        data-input="scaffold-file"
+                                    >
+                                    <label for="scaffold-file" class="file-upload__label">
+                                        <span class="file-upload__button">Upload scaffold (*.smi)</span>
+                                        <span class="file-upload__filename">No file chosen</span>
+                                    </label>
+                                </div>
+                            </form>
+                            
+                            <!-- Fragment Linking Form (initially hidden) -->
+                            <form class="mode-form mode-form--fragment" data-mode-form="Fragment Linking">
+                                <div class="input-group">
+                                    <label for="fragment1-smiles" class="input-group__label">Fragment 1 SMILES</label>
+                                    <input 
+                                        type="text" 
+                                        id="fragment1-smiles" 
+                                        class="input-group__input"
+                                        placeholder="e.g. c1ccccc1C(=O)O"
+                                        data-input="fragment1-smiles"
+                                    >
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label for="fragment2-smiles" class="input-group__label">Fragment 2 SMILES</label>
+                                    <input 
+                                        type="text" 
+                                        id="fragment2-smiles" 
+                                        class="input-group__input"
+                                        placeholder="e.g. C1CCN(CC1)C(=O)C"
+                                        data-input="fragment2-smiles"
+                                    >
+                                </div>
+                                
+                                <div class="file-upload">
+                                    <input 
+                                        type="file" 
+                                        id="fragment-file" 
+                                        class="file-upload__input"
+                                        accept=".smi"
+                                        data-input="fragment-file"
+                                    >
+                                    <label for="fragment-file" class="file-upload__label">
+                                        <span class="file-upload__button">Upload fragments (*.smi)</span>
+                                        <span class="file-upload__filename">No file chosen</span>
+                                    </label>
+                                </div>
+                            </form>
+                            
+                        </div>
+                    </div>
+                    
+                    <!-- Property Configuration Panel -->
+                    <div class="property-config">
+                        <form class="property-form" data-component="property-form">
+                            
+                            <!-- Sample Count Input -->
+                            <div class="form-field">
+                                <label for="num-samples" class="form-field__label">Samples</label>
+                                <input 
+                                    type="number" 
+                                    id="num-samples" 
+                                    class="form-field__input form-field__input--number"
+                                    name="num_samples"
+                                    min="1" 
+                                    max="500" 
+                                    step="1" 
+                                    value="0"
+                                    data-input="samples"
+                                >
+                            </div>
+                            
+                            <!-- Temperature Slider -->
+                            <div class="form-field">
+                                <label for="temperature" class="form-field__label">Temperature</label>
+                                <div class="slider-control">
+                                    <input 
+                                        type="range" 
+                                        id="temperature" 
+                                        class="slider-control__slider"
+                                        name="temperature"
+                                        min="0" 
+                                        max="2" 
+                                        step="0.1" 
+                                        value="1"
+                                        data-input="temperature"
+                                    >
+                                    <span class="slider-control__value" data-element="temperature-value">1.0</span>
+                                </div>
+                            </div>
+                            
+                        </form>
+                    </div>
+                    
+                </section>
+
+                <!-- Generation Control -->
+                <section class="generation-control">
+                    <button 
+                        id="generate-button" 
+                        class="generate-button"
+                        type="button"
+                        data-action="generate"
+                    >
+                        Generate
+                    </button>
+                </section>
+                
+            </section>
+
+            <!-- Right Panel: Results Display -->
+            <section class="app__right-panel">
+                <div class="results" data-component="results">
+                    <div class="results__content" data-element="results-content">
+                        <!-- Results will be dynamically injected here -->
+                    </div>
+                </div>
+            </section>
+            
+        </div>
+    </main>
+
+    <!-- JavaScript Modules -->
+    <script type="module" src="scripts/main.js"></script>
+</body>
+</html>
