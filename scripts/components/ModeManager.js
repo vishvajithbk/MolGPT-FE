@@ -38,12 +38,16 @@ export class ModeManager {
             forms: null,
             scaffoldForm: null,
             fragmentForm: null,
+            transformationForm: null,
             scaffoldSmilesInput: null,
             scaffoldFileInput: null,
             fragment1Input: null,
             fragment2Input: null,
             fragmentFileInput: null,
-            fileLabels: {}
+            startingMoleculeInput: null,
+            similaritySelector: null,
+            fileLabels: {},
+            similaritySelect: null
         };
         
         // Mode configuration data
@@ -73,7 +77,8 @@ export class ModeManager {
             'Molecular Transformation': {
                 title: 'Molecular Transformation',
                 description: 'Suggest structurally similar molecules or modifications. Input your starting molecule and adjust transformation settings below.',
-                hasForm: false
+                hasForm: true,
+                formType: 'transformation'
             },
             'Peptide Design': {
                 title: 'Peptide Design',
@@ -115,6 +120,7 @@ export class ModeManager {
         // Cache form elements
         this.elements.scaffoldForm = this.element.querySelector('[data-mode-form="Scaffold Decoration"]');
         this.elements.fragmentForm = this.element.querySelector('[data-mode-form="Fragment Linking"]');
+        this.elements.transformationForm = this.element.querySelector('[data-mode-form="Molecular Transformation"]');
         
         // Cache input elements
         this.elements.scaffoldSmilesInput = this.element.querySelector('[data-input="scaffold-smiles"]');
@@ -122,10 +128,15 @@ export class ModeManager {
         this.elements.fragment1Input = this.element.querySelector('[data-input="fragment1-smiles"]');
         this.elements.fragment2Input = this.element.querySelector('[data-input="fragment2-smiles"]');
         this.elements.fragmentFileInput = this.element.querySelector('[data-input="fragment-file"]');
+        this.elements.startingMoleculeInput = this.element.querySelector('[data-input="starting-molecule-smiles"]');
+        this.elements.transformationFileInput = this.element.querySelector('[data-input="transformation-file"]');
+        this.elements.similaritySelector = this.element.querySelector('[data-component="similarity-selector"]');
+        this.elements.similaritySelect = this.element.querySelector('[data-input="similarity"]');
         
         // Cache file upload labels
         this.elements.fileLabels.scaffold = this.elements.scaffoldFileInput?.parentElement.querySelector('.file-upload__filename');
         this.elements.fileLabels.fragment = this.elements.fragmentFileInput?.parentElement.querySelector('.file-upload__filename');
+        this.elements.fileLabels.transformation = this.elements.transformationFileInput?.parentElement.querySelector('.file-upload__filename');
         
         // Validate required elements
         if (!this.elements.instructions || !this.elements.forms) {
@@ -148,6 +159,9 @@ export class ModeManager {
         
         // File change listeners
         this.setupFileListeners();
+        
+        // Note: Similarity selector setup moved to updateFormVisibility
+        // to ensure it's initialized when the form is actually visible
     }
 
     /**
@@ -157,13 +171,19 @@ export class ModeManager {
         const inputElements = [
             this.elements.scaffoldSmilesInput,
             this.elements.fragment1Input,
-            this.elements.fragment2Input
+            this.elements.fragment2Input,
+            this.elements.startingMoleculeInput
         ].filter(Boolean);
         
         inputElements.forEach(input => {
             input.addEventListener('input', this.handleInputChange);
             input.addEventListener('blur', this.handleInputChange);
         });
+
+        // Similarity <select> uses change event
+        if (this.elements.similaritySelect) {
+            this.elements.similaritySelect.addEventListener('change', this.handleInputChange);
+        }
     }
 
     /**
@@ -172,7 +192,8 @@ export class ModeManager {
     setupFileListeners() {
         const fileInputs = [
             { input: this.elements.scaffoldFileInput, type: 'scaffold' },
-            { input: this.elements.fragmentFileInput, type: 'fragment' }
+            { input: this.elements.fragmentFileInput, type: 'fragment' },
+            { input: this.elements.transformationFileInput, type: 'transformation' }
         ].filter(item => item.input);
         
         fileInputs.forEach(({ input, type }) => {
@@ -180,6 +201,101 @@ export class ModeManager {
                 this.handleFileChange(event, type);
             });
         });
+    }
+
+    /**
+     * Set up similarity selector dropdown
+     */
+    setupSimilaritySelector() {
+        if (!this.elements.similaritySelector) return;
+        
+        // Check if already initialized to prevent duplicate listeners
+        if (this.elements.similaritySelector.hasAttribute('data-initialized')) return;
+        
+        const trigger = this.elements.similaritySelector.querySelector('.similarity-selector__trigger');
+        const menu = this.elements.similaritySelector.querySelector('.similarity-selector__menu');
+        const options = this.elements.similaritySelector.querySelectorAll('.similarity-selector__option');
+        const currentText = this.elements.similaritySelector.querySelector('.similarity-selector__current-text');
+        
+        if (!trigger || !menu || !options.length || !currentText) return;
+        
+        // Handle trigger click
+        trigger.addEventListener('click', () => {
+            const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+            trigger.setAttribute('aria-expanded', !isOpen);
+            menu.setAttribute('aria-expanded', !isOpen);
+        });
+        
+        // Handle option clicks
+        options.forEach(option => {
+            option.addEventListener('click', (event) => {
+                event.preventDefault();
+                
+                const similarity = option.getAttribute('data-similarity');
+                const text = option.textContent.trim();
+                
+                // Update UI
+                currentText.textContent = text;
+                currentText.classList.add('similarity-selector__current-text--selected');
+                
+                // Close dropdown
+                trigger.setAttribute('aria-expanded', 'false');
+                menu.setAttribute('aria-expanded', 'false');
+                
+                // Update form data
+                this.state.formData.similarity = similarity;
+                
+                console.log(`📝 Similarity changed: ${similarity}`);
+                
+                // Emit form data change event
+                if (this.eventBus) {
+                    this.eventBus.emit('form:dataChanged', {
+                        similarity: similarity
+                    });
+                }
+            });
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!this.elements.similaritySelector.contains(event.target)) {
+                trigger.setAttribute('aria-expanded', 'false');
+                menu.setAttribute('aria-expanded', 'false');
+            }
+        });
+        
+        // Handle keyboard navigation
+        trigger.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                trigger.click();
+            }
+        });
+        
+        options.forEach((option, index) => {
+            option.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    option.click();
+                } else if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    const nextOption = options[index + 1] || options[0];
+                    nextOption.focus();
+                } else if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    const prevOption = options[index - 1] || options[options.length - 1];
+                    prevOption.focus();
+                } else if (event.key === 'Escape') {
+                    trigger.setAttribute('aria-expanded', 'false');
+                    menu.setAttribute('aria-expanded', 'false');
+                    trigger.focus();
+                }
+            });
+        });
+        
+        // Mark as initialized to prevent duplicate setup
+        this.elements.similaritySelector.setAttribute('data-initialized', 'true');
+        console.log('✅ Similarity selector initialized');
     }
 
     /**
@@ -261,6 +377,11 @@ export class ModeManager {
                 // Add slight delay for smooth transition
                 setTimeout(() => {
                     targetForm.classList.add('mode-form--active');
+                    
+                    // Set up similarity selector when transformation form becomes active
+                    if (config.formType === 'transformation') {
+                        this.setupSimilaritySelector();
+                    }
                 }, 100);
             }
         }
@@ -274,7 +395,8 @@ export class ModeManager {
     getFormModeKey(formType) {
         const typeToMode = {
             'scaffold': 'Scaffold Decoration',
-            'fragment': 'Fragment Linking'
+            'fragment': 'Fragment Linking',
+            'transformation': 'Molecular Transformation'
         };
         
         return typeToMode[formType] || '';
@@ -289,15 +411,26 @@ export class ModeManager {
         const inputType = input.getAttribute('data-input');
         const value = input.value.trim();
         
-        // Update form data
-        this.state.formData[inputType] = value;
+        // Map input types to form data keys
+        const fieldMapping = {
+            'scaffold-smiles': 'scaffold',
+            'fragment1-smiles': 'fragment1',
+            'fragment2-smiles': 'fragment2',
+            'starting-molecule-smiles': 'startingMolecule',
+            'similarity': 'similarity'
+        };
         
-        console.log(`📝 Input changed: ${inputType} = "${value}"`);
+        const formDataKey = fieldMapping[inputType] || inputType;
+        
+        // Update form data
+        this.state.formData[formDataKey] = value;
+        
+        console.log(`📝 Input changed: ${inputType} -> ${formDataKey} = "${value}"`);
         
         // Emit form data change event
         if (this.eventBus) {
             this.eventBus.emit('form:dataChanged', {
-                [inputType]: value
+                [formDataKey]: value
             });
         }
         
@@ -319,15 +452,18 @@ export class ModeManager {
             this.elements.fileLabels[type].textContent = filename;
         }
         
+        // Map file types to form data keys
+        const fileDataKey = `${type}File`;
+        
         // Update form data
-        this.state.formData[`${type}File`] = file;
+        this.state.formData[fileDataKey] = file;
         
         console.log(`📁 File ${type} changed: ${filename}`);
         
         // Emit form data change event
         if (this.eventBus) {
             this.eventBus.emit('form:dataChanged', {
-                [`${type}File`]: file
+                [fileDataKey]: file
             });
         }
     }
@@ -346,8 +482,8 @@ export class ModeManager {
         let isValid = true;
         
         if (inputType && inputType.includes('smiles')) {
-            // Basic SMILES validation (non-empty and contains typical SMILES characters)
-            isValid = value.length > 0 && /^[A-Za-z0-9\(\)\[\]@=#\-\+\.\\\/:]+$/.test(value);
+            // Basic SMILES validation (non-empty and contains typical SMILES characters including *)
+            isValid = value.length > 0 && /^[A-Za-z0-9\(\)\[\]@=#\-\+\.\\\/:*]+$/.test(value);
         }
         
         // Apply validation styling
@@ -364,7 +500,8 @@ export class ModeManager {
         const inputs = [
             this.elements.scaffoldSmilesInput,
             this.elements.fragment1Input,
-            this.elements.fragment2Input
+            this.elements.fragment2Input,
+            this.elements.startingMoleculeInput
         ].filter(Boolean);
         
         inputs.forEach(input => {
@@ -375,7 +512,8 @@ export class ModeManager {
         // Clear file inputs
         const fileInputs = [
             this.elements.scaffoldFileInput,
-            this.elements.fragmentFileInput
+            this.elements.fragmentFileInput,
+            this.elements.transformationFileInput
         ].filter(Boolean);
         
         fileInputs.forEach(input => {
@@ -386,6 +524,11 @@ export class ModeManager {
         Object.values(this.elements.fileLabels).forEach(label => {
             if (label) label.textContent = 'No file chosen';
         });
+        
+        // Reset similarity selector
+        if (this.elements.similaritySelect) {
+            this.elements.similaritySelect.selectedIndex = 0; // reset to placeholder
+        }
         
         // Clear form data state
         this.state.formData = {};
@@ -408,12 +551,25 @@ export class ModeManager {
     setFormData(data) {
         this.state.formData = { ...this.state.formData, ...data };
         
+        // Reverse mapping for UI updates
+        const reverseFieldMapping = {
+            'scaffold': 'scaffold-smiles',
+            'fragment1': 'fragment1-smiles',
+            'fragment2': 'fragment2-smiles',
+            'startingMolecule': 'starting-molecule-smiles'
+        };
+        
         // Update UI to reflect new data
         Object.entries(data).forEach(([key, value]) => {
-            const input = this.element.querySelector(`[data-input="${key}"]`);
-            if (input && typeof value === 'string') {
-                input.value = value;
-                this.validateInput(input, value);
+            if (key === 'similarity' && this.elements.similaritySelect) {
+                this.elements.similaritySelect.value = value;
+            } else {
+                const inputKey = reverseFieldMapping[key] || key;
+                const input = this.element.querySelector(`[data-input="${inputKey}"]`);
+                if (input && typeof value === 'string') {
+                    input.value = value;
+                    this.validateInput(input, value);
+                }
             }
         });
     }

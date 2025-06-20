@@ -1,0 +1,14 @@
+---
+description: 
+globs: *.css
+alwaysApply: false
+---
+# Desktop CSS Modularity (@css, @desktop)
+
+This rule helps with:
+
+- Follow BEM naming (`.mode-zone__header`, `.mode-zone__content`)
+- Extract all reusable values to `:root` CSS variables (colors, spacing, fonts)
+- Use `box-sizing: border-box;` globally to stabilize sizing
+- Restrict layout to desktop: wrap rules in `@media (min-width: 1024px) { … }`
+- Eliminate overlapping selectors—each component gets its own block

@@ -1,0 +1,13 @@
+---
+description: 
+globs: *.html
+alwaysApply: false
+---
+# Desktop HTML Structure (@html, @desktop)
+
+This rule helps with:
+
+- Enforce semantic, modular containers (`<header>`, `<nav>`, `<main>`, `<section>`, `<footer>`)
+- Ensure your “mode zone” element has a unique class or data-attribute (e.g. `data-mode-zone`)
+- Keep the mode container wrapper at a fixed dimension in your markup
+- Avoid deeply nested tags—limit to 3 levels max for readability

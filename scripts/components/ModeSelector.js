@@ -45,7 +45,8 @@ export class ModeSelector {
             menu: null,
             currentText: null,
             options: null,
-            arrow: null
+            arrow: null,
+            menuIcon: null
         };
         
         // Bind methods to preserve context
@@ -54,6 +55,7 @@ export class ModeSelector {
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleClickOutside = this.handleClickOutside.bind(this);
         this.handleEscapeKey = this.handleEscapeKey.bind(this);
+        this.handleMenuIconClick = this.handleMenuIconClick.bind(this);
         
         this.init();
     }
@@ -82,6 +84,7 @@ export class ModeSelector {
         this.elements.currentText = this.element.querySelector('.mode-selector__current-text');
         this.elements.options = this.element.querySelectorAll('.mode-selector__option');
         this.elements.arrow = this.element.querySelector('.mode-selector__arrow');
+        this.elements.menuIcon = this.element.querySelector('.mode-selector__menu-icon');
         
         // Validate required elements
         const requiredElements = ['trigger', 'menu', 'currentText'];
@@ -98,6 +101,11 @@ export class ModeSelector {
     setupEventListeners() {
         // Trigger click event
         this.elements.trigger.addEventListener('click', this.handleTriggerClick);
+        
+        // Menu icon click event (reset to Select Mode)
+        if (this.elements.menuIcon) {
+            this.elements.menuIcon.addEventListener('click', this.handleMenuIconClick);
+        }
         
         // Option click events
         this.elements.options.forEach(option => {
@@ -378,6 +386,7 @@ export class ModeSelector {
     destroy() {
         // Remove event listeners
         this.elements.trigger?.removeEventListener('click', this.handleTriggerClick);
+        this.elements.menuIcon?.removeEventListener('click', this.handleMenuIconClick);
         
         this.elements.options.forEach(option => {
             option.removeEventListener('click', this.handleOptionClick);
@@ -392,5 +401,17 @@ export class ModeSelector {
         this.eventBus = null;
         
         console.log('🧹 ModeSelector component destroyed');
+    }
+
+    /**
+     * Handle menu icon click
+     * @param {Event} event - Click event
+     */
+    handleMenuIconClick(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        this.setCurrentMode('Select Mode');
+        this.close();
     }
 } 

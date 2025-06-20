@@ -36,14 +36,14 @@
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 12px;
-  --space-lg: 16px;
+  --space-lg: 12.5px;
   --space-xl: 24px;
-  --space-2xl: 32px;
+  --space-2xl: 25px;
   --space-3xl: 40px;
   
   /* Borders */
-  --border-radius-sm: 6px;
-  --border-radius-md: 12px;
+  --border-radius-sm: 9px;
+  --border-radius-md: 20px;
   --border-radius-lg: 20px;
   --border-radius-xl: 25px;
   --border-radius-full: 9999px;
@@ -55,9 +55,9 @@
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.25);
   
   /* Transitions */
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.3s ease;
-  --transition-slow: 0.5s ease;
+  --transition-fast: 0.05s ease;
+  --transition-normal: 0.10s ease;
+  --transition-slow: 0.15s ease;
   
   /* Z-index layers */
   --z-dropdown: 10;
@@ -119,8 +119,8 @@ body {
   display: flex;
   flex-direction: column;
   background-color: var(--color-surface);
-  padding: var(--space-2xl) var(--space-3xl) 0 var(--space-3xl);
-  gap: var(--space-lg);
+  padding: var(--space-2xl) var(--space-3xl) var(--space-2xl) var(--space-3xl);
+  gap: var(--space-md);
   min-width: 400px; /* Ensure minimum width for controls */
   overflow-y: auto; /* Allow vertical scrolling when content overflows */
   max-height: 100%; /* Ensure panel doesn't exceed container height */
@@ -166,13 +166,13 @@ body {
 .header {
   display: flex;
   align-items: center;
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
 }
 
 .header__logo {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
 }
 
 .header__logo-image {
@@ -292,7 +292,7 @@ body {
   left: var(--space-lg);
   right: var(--space-lg);
   background-color: var(--color-hover);
-  border-radius: var(--space-sm);
+  border-radius: var(--space-md);
   opacity: 0;
   transition: opacity var(--transition-fast);
   z-index: -1;
@@ -318,6 +318,132 @@ body {
   visibility: visible;
   transform: translateY(0);
 }
+
+
+/* ================================================
+   SIMILARITY SELECTOR COMPONENT (Dropdown)
+   ================================================ */
+
+.similarity-selector {
+  position: relative;
+  width: 40%;
+  user-select: none;
+}
+
+/* Similarity dropdown trigger button */
+.similarity-selector__trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: 10px var(--space-md);
+  background-color: var(--color-background);
+  border: none;
+  border-radius: var(--border-radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.similarity-selector__trigger:hover {
+  background-color: var(--color-hover);
+}
+
+.similarity-selector__trigger:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.similarity-selector__arrow {
+  width: 16px;
+  height: 16px;
+  filter: invert(75%);
+  flex-shrink: 0;
+  margin-left: auto;
+  transition: transform var(--transition-normal);
+}
+
+.similarity-selector__current-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-secondary);
+}
+
+.similarity-selector__current-text--selected {
+  color: var(--color-primary);
+}
+
+/* Similarity dropdown menu */
+.similarity-selector__menu {
+  position: absolute;
+  top: calc(100% + var(--space-sm));
+  left: 50%;
+  min-width: 160px;
+  max-width: 55vw;
+  background-color: var(--color-background);
+  border-radius: var(--border-radius-md);
+  padding: var(--space-sm) 0;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all var(--transition-fast);
+  z-index: var(--z-dropdown);
+  list-style: none;
+}
+
+.similarity-selector__menu[aria-expanded="true"] {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.similarity-selector__option {
+  display: block;
+  width: 100%;
+  padding: 10.5px 25px;
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+}
+
+.similarity-selector__option::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--space-lg);
+  right: var(--space-lg);
+  background-color: var(--color-hover);
+  border-radius: var(--space-md);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  z-index: -1;
+}
+
+.similarity-selector__option:hover::before,
+.similarity-selector__option:focus::before {
+  opacity: 1;
+}
+
+.similarity-selector__option:focus {
+  outline: none;
+}
+
+/* Show arrow rotation when menu is open */
+.similarity-selector__trigger[aria-expanded="true"] .similarity-selector__arrow {
+  transform: rotate(180deg);
+}
+
 
 /* ================================================
    MODE CONFIGURATION COMPONENT
@@ -412,8 +538,8 @@ body {
 
 .input-group__input {
   padding: var(--space-sm) var(--space-md);
-  background-color: var(--color-disabled);
-  border: none;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
   font-size: 0.875rem;
   font-weight: 450;
@@ -486,17 +612,29 @@ body {
   border: 0.1px solid var(--color-border);
   border-radius: var(--border-radius-lg);
   padding: var(--space-md);
-  /* Fixed height for consistent layout */
-  height: 120px;
+  /* Adjusted height to accommodate generate button */
+  height: auto;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }
 
 .property-form {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 100%;
   padding: 0 var(--space-2xl);
   gap: var(--space-xl);
+}
+
+.property-generate-section {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 var(--space-2xl);
+  border-top: 0.1px solid var(--color-border);
+  padding-top: var(--space-md);
 }
 
 /* Form field component */
@@ -505,7 +643,7 @@ body {
   align-items: center;
   gap: var(--space-md);
   color: var(--color-primary);
-  font-weight: 450;
+  font-weight: 500;
 }
 
 .form-field__label {
@@ -517,10 +655,10 @@ body {
 .form-field__input {
   font-family: var(--font-primary);
   font-size: 0.875rem;
-  font-weight: 450;
-  border: none;
+  font-weight: 500;
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
-  background-color: var(--color-disabled);
+  background-color: var(--color-surface);
   opacity: 0.8;
   transition: opacity var(--transition-fast);
 }
@@ -542,7 +680,8 @@ body {
 .slider-control {
   display: flex;
   align-items: center;
-  background-color: var(--color-disabled);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
   padding: var(--space-xs) var(--space-sm);
   gap: var(--space-sm);
@@ -560,7 +699,7 @@ body {
 /* Webkit slider track */
 .slider-control__slider::-webkit-slider-runnable-track {
   height: 4px;
-  background-color: var(--color-surface);
+  background-color: var(--color-accent);
   border-radius: 2px;
 }
 
@@ -569,7 +708,7 @@ body {
   appearance: none;
   width: 16px;
   height: 16px;
-  background-color: var(--color-surface);
+  background-color: var(--color-accent);
   border-radius: 50%;
   margin-top: -6px;
   cursor: pointer;
@@ -578,7 +717,7 @@ body {
 /* Firefox slider track */
 .slider-control__slider::-moz-range-track {
   height: 4px;
-  background-color: var(--color-surface);
+  background-color: var(--color-border);
   border-radius: 2px;
   border: none;
 }
@@ -587,9 +726,9 @@ body {
 .slider-control__slider::-moz-range-thumb {
   width: 16px;
   height: 16px;
-  background-color: var(--color-surface);
+  background-color: var(--color-accent);
   border-radius: 50%;
-  border: none;
+  border: 2px solid var(--color-surface);
   cursor: pointer;
 }
 
@@ -597,22 +736,8 @@ body {
   width: 40px;
   text-align: right;
   font-size: 0.875rem;
-  font-weight: 450;
+  font-weight: 500;
   color: var(--color-primary);
-}
-
-/* ================================================
-   GENERATION CONTROL COMPONENT
-   ================================================ */
-
-.generation-control {
-  background-color: var(--color-background);
-  border-radius: var(--border-radius-xl);
-  padding: var(--space-md);
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  height: 90px;
 }
 
 .generate-button {
@@ -724,97 +849,19 @@ body {
 }
 
 /* ================================================
-   RESPONSIVE DESIGN
+   DESKTOP-ONLY DESIGN
    ================================================ */
 
-/* Tablet and smaller desktop screens */
-@media (max-width: 1024px) {
+/* Desktop layout optimizations */
+@media (min-width: 1024px) {
   .app__panel {
-    flex-direction: column;
-    height: auto;
-    min-height: calc(100vh - 30px);
+    display: flex;
+    flex-direction: row;
   }
   
   .app__left-panel,
   .app__right-panel {
-    min-width: unset;
-    flex: none;
-  }
-  
-  .app__left-panel {
-    border-bottom: 1.5px solid var(--color-background);
-  }
-  
-  .app__right-panel {
-    border-left: none;
-    border-top: 1.5px solid var(--color-background);
-  }
-  
-  .property-form {
-    flex-direction: column;
-    gap: var(--space-lg);
-    padding: var(--space-lg);
-  }
-  
-  .property-config {
-    height: auto;
-    min-height: 120px;
-  }
-}
-
-/* Mobile screens */
-@media (max-width: 768px) {
-  .app {
-    padding: var(--space-sm);
-  }
-  
-  .app__panel {
-    height: calc(100vh - 16px);
-  }
-  
-  .app__left-panel,
-  .app__right-panel {
-    padding: var(--space-lg) var(--space-xl);
-  }
-  
-  .mode-selector {
-    width: 100%;
-  }
-  
-  .mode-selector__menu {
-    left: 0;
-    right: 0;
-    max-width: none;
-  }
-  
-  .mode-config__content {
-    height: auto;
-    min-height: 400px;
-  }
-  
-  .property-form {
-    padding: var(--space-md);
-  }
-  
-  .slider-control {
-    min-width: 120px;
-  }
-}
-
-/* Small mobile screens */
-@media (max-width: 480px) {
-  .app__left-panel,
-  .app__right-panel {
-    padding: var(--space-md) var(--space-lg);
-  }
-  
-  .header__title {
-    font-size: 1.1rem;
-  }
-  
-  .generate-button {
-    padding: var(--space-sm) var(--space-lg);
-    font-size: 1rem;
+    min-width: 400px;
   }
 }
 
@@ -906,14 +953,6 @@ body {
   border-color: var(--color-error);
 }
 
-/* Property form validation states */
-.property-form--valid {
-  background-color: rgba(16, 185, 129, 0.05);
-}
-
-.property-form--invalid {
-  background-color: rgba(239, 68, 68, 0.05);
-}
 
 /* Generate button states */
 .generate-button--generating {
@@ -941,10 +980,42 @@ body {
   color: var(--color-primary);
 }
 
-.results__timestamp {
+.results__timestamp-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin: var(--space-sm) 0 0 0;
+}
+
+.results__timestamp {
+  margin: 0;
   font-size: 0.875rem;
   color: var(--color-secondary);
+}
+
+.results__download-button {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-md);
+  background-color: var(--color-accent);
+  color: var(--color-surface);
+  text-decoration: none;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.results__download-button:hover {
+  background-color: #4c5560;
+  transform: translateY(-1px);
+}
+
+.results__download-button:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .results__molecule-list {
@@ -1136,4 +1207,45 @@ body {
     transform: translateX(0);
     opacity: 1;
   }
-} 
+}
+
+
+/* ================================================
+   SIMILARITY SELECT (NATIVE <select>)
+   ================================================ */
+
+   .similarity-select {
+    width: 100%;
+    padding: 10px var(--space-md);
+    background-color: var(--color-background);
+    border: none;
+    border-radius: var(--border-radius-full);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* leave room for arrow */
+    padding-right: 2.5rem;
+    background-image: url("svg and png files/droparrow.svg");
+    background-repeat: no-repeat;
+    background-position: right var(--space-md) center;
+    background-size: 20px;
+  }
+  
+  .similarity-select:hover {
+    background-color: var(--color-hover);
+  }
+  
+  .similarity-select:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  
+  /* Hide default arrow in IE */
+  .similarity-select::-ms-expand {
+    display: none;
+  } 

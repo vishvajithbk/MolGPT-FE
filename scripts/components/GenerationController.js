@@ -29,7 +29,7 @@ export class GenerationController {
         // Configuration
         this.config = {
             apiEndpoint: options.apiEndpoint || 'http://127.0.0.1:8000/generate-molecules',
-            timeout: options.timeout || 60000, // 60 seconds
+            timeout: options.timeout || 600000, // 600 seconds ~ 10 minutes
             maxRetries: options.maxRetries || 3
         };
         
@@ -88,9 +88,8 @@ export class GenerationController {
     async handleClick(event) {
         event.preventDefault();
         
+        // Don't do anything if already generating
         if (this.state.isGenerating) {
-            // If already generating, cancel the request
-            this.cancelGeneration();
             return;
         }
         
@@ -175,24 +174,6 @@ export class GenerationController {
     }
 
     /**
-     * Cancel ongoing generation
-     */
-    cancelGeneration() {
-        console.log('🛑 Cancelling generation...');
-        
-        if (this.state.abortController) {
-            this.state.abortController.abort();
-        }
-        
-        this.state.isGenerating = false;
-        this.updateButtonState();
-        
-        if (this.eventBus) {
-            this.eventBus.emit('generation:cancelled');
-        }
-    }
-
-    /**
      * Validate form data before generation
      * @returns {Object} Validation result
      */
@@ -234,6 +215,17 @@ export class GenerationController {
             }
         }
         
+        if (this.state.currentMode === 'Molecular Transformation') {
+            const { startingMolecule, transformationFile, similarity } = this.state.formData;
+            if (!startingMolecule && !transformationFile) {
+                errors.push('Please provide a starting molecule SMILES or upload a molecules file');
+            }
+            if (!similarity) {
+                errors.push('Please select a similarity level');
+            }
+        }
+
+        
         return {
             isValid: errors.length === 0,
             errors
@@ -261,6 +253,11 @@ export class GenerationController {
             payload.fragment1 = this.state.formData.fragment1 || '';
             payload.fragment2 = this.state.formData.fragment2 || '';
             // Note: File content would need to be read separately
+        }
+        
+        if (this.state.currentMode === 'Molecular Transformation') {
+            payload.starting_molecule = this.state.formData.startingMolecule || '';
+            payload.similarity = this.state.formData.similarity || '';
         }
         
         return payload;
@@ -342,6 +339,16 @@ export class GenerationController {
             }
         }
         
+        // Handle transformation file
+        if (this.state.formData.transformationFile) {
+            try {
+                const fileContent = await this.readFileAsText(this.state.formData.transformationFile);
+                requestPayload.transformation_file_text = fileContent;
+            } catch (error) {
+                console.warn('⚠️ Failed to read transformation file:', error);
+            }
+        }
+        
         return requestPayload;
     }
 
@@ -390,17 +397,14 @@ export class GenerationController {
         const validation = this.validateForm();
         const canGenerate = validation.isValid && !this.state.isGenerating;
         
-        // Update button text and appearance
-        if (this.state.isGenerating) {
-            this.element.textContent = 'Cancel';
-            this.element.classList.add('generate-button--generating');
-        } else {
-            this.element.textContent = 'Generate';
-            this.element.classList.remove('generate-button--generating');
-        }
+        // Keep button text as "Generate" always
+        this.element.textContent = 'Generate';
         
-        // Update disabled state
-        this.element.disabled = !canGenerate && !this.state.isGenerating;
+        // Remove any generating styling
+        this.element.classList.remove('generate-button--generating');
+        
+        // Update disabled state - disable when generating or form is invalid
+        this.element.disabled = !canGenerate;
         this.element.classList.toggle('generate-button--disabled', this.element.disabled);
         
         // Update ARIA attributes

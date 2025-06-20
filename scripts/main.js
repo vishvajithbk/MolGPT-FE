@@ -43,7 +43,10 @@ class MolGPTApp {
                 fragment1: '',
                 fragment2: '',
                 scaffoldFile: null,
-                fragmentFile: null
+                fragmentFile: null,
+                startingMolecule: '',
+                transformationFile: null,
+                similarity: ''
             }
         };
 
@@ -379,6 +382,16 @@ class MolGPTApp {
             }
         }
         
+        if (this.state.currentMode === 'Molecular Transformation') {
+            const { startingMolecule, transformationFile, similarity } = this.state.formData;
+            if (!startingMolecule && !transformationFile) {
+                errors.push('Please provide a starting molecule SMILES or upload a molecules file');
+            }
+            if (!similarity) {
+                errors.push('Please select a similarity level');
+            }
+        }
+        
         return {
             isValid: errors.length === 0,
             errors
@@ -397,7 +410,10 @@ class MolGPTApp {
             fragment1: '',
             fragment2: '',
             scaffoldFile: null,
-            fragmentFile: null
+            fragmentFile: null,
+            startingMolecule: '',
+            transformationFile: null,
+            similarity: ''
         };
     }
 

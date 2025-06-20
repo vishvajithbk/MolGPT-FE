@@ -17,6 +17,11 @@
  * ================================================
  */
 
+// API configuration
+const API_BASE = typeof process !== 'undefined' && process.env && process.env.API_BASE 
+    ? process.env.API_BASE 
+    : 'http://127.0.0.1:8000';
+
 export class ResultsDisplay {
     /**
      * Initialize the ResultsDisplay component
@@ -146,11 +151,13 @@ export class ResultsDisplay {
         const {
             generated_molecules = [],
             total_generated = 0,
-            valid_molecules = 0
+            valid_molecules = 0,
+            requestParams = {},
+            csv_url = null
         } = results;
         
         // Create results summary
-        const summaryHTML = this.createResultsSummary(total_generated, valid_molecules);
+        const summaryHTML = this.createResultsSummary(total_generated, valid_molecules, requestParams, csv_url);
         
         // Create molecules list
         const moleculesHTML = this.createMoleculesList(generated_molecules);
@@ -164,8 +171,9 @@ export class ResultsDisplay {
         this.elements.content.innerHTML = resultsHTML;
         
         // Add accessibility attributes
+        // const invalid = total_generated - valid_molecules;
         this.elements.content.setAttribute('aria-live', 'polite');
-        this.elements.content.setAttribute('aria-label', `Generation results: ${total_generated} molecules generated, ${valid_molecules} valid`);
+        this.elements.content.setAttribute('aria-label', `Generation results: Generated: ${total_generated}, Valid: ${valid_molecules}`); //, Invalid: ${invalid}`);
         
         // Scroll to top of results
         this.elements.content.scrollTop = 0;
@@ -175,34 +183,66 @@ export class ResultsDisplay {
      * Create results summary HTML
      * @param {number} total - Total molecules generated
      * @param {number} valid - Valid molecules count
+     * @param {Object} requestParams - Original request parameters
+     * @param {string|null} csvUrl - CSV download URL
      * @returns {string} Summary HTML
      */
-    createResultsSummary(total, valid) {
-        const validPercentage = total > 0 ? Math.round((valid / total) * 100) : 0;
+    createResultsSummary(total, valid, requestParams = {}, csvUrl = null) {
+        const samples = requestParams.samples || 0;
+        const invalid = requestParams - valid;
+        
+        // Create the new message format: Generated: X, Valid: Y, Invalid: Z
+        const summaryMessage = `Generated: ${total}, Valid: ${valid}`; //, Invalid: ${invalid}`;
+        
+        // Add context about expected vs actual if samples info is available
+        let contextMessage = '';
+        if (samples > 0) {
+            if (total !== samples) {
+                contextMessage = ` (Expected ${samples} samples)`;
+            }
+        }
         
         return `
             <div class="results__summary">
                 <p class="results__status">
                     <strong>Generation Complete!</strong> 
-                    Generated ${total} molecules, ${valid} valid (${validPercentage}%).
+                    ${summaryMessage}${contextMessage}
                 </p>
-                ${this.createGenerationTimestamp()}
+                ${this.createGenerationTimestamp(csvUrl)}
             </div>
         `;
     }
 
     /**
      * Create generation timestamp
+     * @param {string|null} csvUrl - CSV download URL
      * @returns {string} Timestamp HTML
      */
-    createGenerationTimestamp() {
+    createGenerationTimestamp(csvUrl = null) {
         if (!this.state.lastGeneration) return '';
         
         const timestamp = this.state.lastGeneration.toLocaleTimeString();
+        
+        // Construct full CSV download URL by prepending API base URL
+        let fullCsvUrl = null;
+        if (csvUrl) {
+            // If csvUrl starts with '/', prepend API_BASE, otherwise use as-is
+            fullCsvUrl = csvUrl.startsWith('/') ? `${API_BASE}${csvUrl}` : csvUrl;
+        }
+        
+        const downloadButton = fullCsvUrl ? `
+            <a href="${fullCsvUrl}" download class="results__download-button">
+                Download CSV
+            </a>
+        ` : '';
+        
         return `
-            <p class="results__timestamp">
-                Generated at ${timestamp}
-            </p>
+            <div class="results__timestamp-container">
+                <p class="results__timestamp">
+                    Generated at ${timestamp}
+                </p>
+                ${downloadButton}
+            </div>
         `;
     }
 
@@ -351,11 +391,11 @@ export class ResultsDisplay {
         if (!this.state.results) return '';
         
         const { generated_molecules = [], total_generated = 0, valid_molecules = 0 } = this.state.results;
+        // const invalid = total_generated - valid_molecules;
         
         let text = `MolGPT Generation Results\n`;
         text += `Generated: ${this.state.lastGeneration?.toLocaleString() || 'Unknown'}\n`;
-        text += `Total molecules: ${total_generated}\n`;
-        text += `Valid molecules: ${valid_molecules}\n\n`;
+        text += `Generated: ${total_generated}, Valid: ${valid_molecules}\n\n`; // Invalid: ${invalid}
         
         text += `SMILES:\n`;
         generated_molecules.forEach((molecule, index) => {
@@ -427,4 +467,4 @@ export class ResultsDisplay {
         
         console.log('🧹 ResultsDisplay component destroyed');
     }
-} 
+}

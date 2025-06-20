@@ -140,6 +140,50 @@
                                 </div>
                             </form>
                             
+                            <!-- Molecular Transformation Form (initially hidden) -->
+                            <form class="mode-form mode-form--transformation" data-mode-form="Molecular Transformation">
+                                <div class="input-group">
+                                    <label for="starting-molecule-smiles" class="input-group__label">Starting Molecule</label>
+                                    <input 
+                                        type="text" 
+                                        id="starting-molecule-smiles" 
+                                        class="input-group__input"
+                                        placeholder="Enter SMILES string"
+                                        data-input="starting-molecule-smiles"
+                                    >
+                                </div>
+                                
+                                <div class="file-upload">
+                                    <input 
+                                        type="file" 
+                                        id="transformation-file" 
+                                        class="file-upload__input"
+                                        accept=".smi"
+                                        data-input="transformation-file"
+                                    >
+                                    <label for="transformation-file" class="file-upload__label">
+                                        <span class="file-upload__button">Upload molecules (*.smi)</span>
+                                        <span class="file-upload__filename">No file chosen</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label for="similarity-select" class="input-group__label">Similarity</label>
+                                    <div class="similarity-selector" data-component="similarity-selector">
+                                        <button type="button" class="similarity-selector__trigger" aria-haspopup="true" aria-expanded="false" data-input="similarity">
+                                            <span class="similarity-selector__current-text">Select similarity level</span>
+                                            <img src="svg and png files/droparrow.svg" alt="" class="similarity-selector__arrow" aria-hidden="true">
+                                        </button>
+                                        <ul class="similarity-selector__menu" role="menu">
+                                            <li role="menuitem"><button type="button" class="similarity-selector__option" data-similarity="Tanimoto-High">Tanimoto-High</button></li>
+                                            <li role="menuitem"><button type="button" class="similarity-selector__option" data-similarity="Tanimoto-Higher">Tanimoto-Higher</button></li>
+                                            <li role="menuitem"><button type="button" class="similarity-selector__option" data-similarity="Tanimoto-Highest">Tanimoto-Highest</button></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </form>
+                            
+                            
                         </div>
                     </div>
                     
@@ -183,21 +227,23 @@
                             </div>
                             
                         </form>
+                        
+                        <!-- Generate Button Section -->
+                        <div class="property-generate-section">
+                            <button 
+                                id="generate-button" 
+                                class="generate-button"
+                                type="button"
+                                data-action="generate"
+                            >
+                                Generate
+                            </button>
+                        </div>
                     </div>
                     
                 </section>
 
-                <!-- Generation Control -->
-                <section class="generation-control">
-                    <button 
-                        id="generate-button" 
-                        class="generate-button"
-                        type="button"
-                        data-action="generate"
-                    >
-                        Generate
-                    </button>
-                </section>
+
                 
             </section>
 
