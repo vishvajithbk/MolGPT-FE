@@ -34,8 +34,7 @@ export class ModeSelector {
                 'De Novo Generation',
                 'Scaffold Decoration', 
                 'Fragment Linking',
-                'Molecular Transformation',
-                'Peptide Design'
+                'Molecular Transformation'
             ]
         };
         

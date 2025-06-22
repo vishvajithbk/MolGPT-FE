@@ -42,7 +42,7 @@ MolGPT frontend/
 - **Scaffold Decoration**: Decorate core structures with R-groups
 - **Fragment Linking**: Connect molecular fragments with novel linkers
 - **Molecular Transformation**: Generate similar or modified molecules
-- **Peptide Design**: Design peptide sequences with specific properties
+
 
 ### User Experience
 - **Fixed-size mode container** prevents layout shifts during mode switching

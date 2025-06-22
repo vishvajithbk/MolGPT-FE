@@ -79,11 +79,6 @@ export class ModeManager {
                 description: 'Suggest structurally similar molecules or modifications. Input your starting molecule and adjust transformation settings below.',
                 hasForm: true,
                 formType: 'transformation'
-            },
-            'Peptide Design': {
-                title: 'Peptide Design',
-                description: 'Generate peptide sequences matching your criteria. No structural input required - adjust sequence and property constraints below.',
-                hasForm: false
             }
         };
         
