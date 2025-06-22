@@ -28,7 +28,7 @@ export class GenerationController {
         
         // Configuration
         this.config = {
-            apiEndpoint: options.apiEndpoint || 'https://molgpt-be.onrender.com/generate-molecules',
+            apiEndpoint: options.apiEndpoint || 'http://127.0.0.1:8000/generate-molecules',
             timeout: options.timeout || 600000, // 600 seconds ~ 10 minutes
             maxRetries: options.maxRetries || 3
         };

@@ -20,7 +20,7 @@
 // API configuration
 const API_BASE = typeof process !== 'undefined' && process.env && process.env.API_BASE 
     ? process.env.API_BASE 
-    : 'https://molgpt-be.onrender.com';
+    : 'http://127.0.0.1:8000';
 
 export class ResultsDisplay {
     /**

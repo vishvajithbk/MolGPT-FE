@@ -197,7 +197,7 @@ Comprehensive error handling throughout the application:
 ## 🚀 Getting Started
 
 1. **Serve the files** through a web server (required for ES6 modules)
-2. **Ensure API server** is running at `https://molgpt-be.onrender.com`
+2. **Ensure API server** is running at `http://127.0.0.1:8000`
 3. **Open** `index.html` in a supported browser
 
 ### Development Server
