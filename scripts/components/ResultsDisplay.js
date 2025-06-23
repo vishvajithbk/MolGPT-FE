@@ -20,7 +20,7 @@
 // API configuration
 const API_BASE = typeof process !== 'undefined' && process.env && process.env.API_BASE 
     ? process.env.API_BASE 
-    : 'http://127.0.0.1:8000';
+    : 'http://20.9.132.173:8000';
 
 export class ResultsDisplay {
     /**
