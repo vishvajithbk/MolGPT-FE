@@ -20,7 +20,7 @@
 // API configuration
 const API_BASE = typeof process !== 'undefined' && process.env && process.env.API_BASE 
     ? process.env.API_BASE 
-    : 'https://ak-hostel-netxel-michelle.trycloudflare.com';
+    : 'https://temperature-avatar-networks-audience.trycloudflare.com';
 
 export class ResultsDisplay {
     /**
