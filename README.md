@@ -197,7 +197,7 @@ Comprehensive error handling throughout the application:
 ## 🚀 Getting Started
 
 1. **Serve the files** through a web server (required for ES6 modules)
-2. **Ensure API server** is running at `http://20.9.132.173:8000`
+2. **Ensure API server** is running at `https://ak-hostel-netxel-michelle.trycloudflare.com`
 3. **Open** `index.html` in a supported browser
 
 ### Development Server

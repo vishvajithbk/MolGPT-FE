@@ -28,7 +28,7 @@ export class GenerationController {
         
         // Configuration
         this.config = {
-            apiEndpoint: options.apiEndpoint || 'http://20.9.132.173:8000/generate-molecules',
+            apiEndpoint: options.apiEndpoint || 'https://ak-hostel-netxel-michelle.trycloudflare.com/generate-molecules',
             timeout: options.timeout || 600000, // 600 seconds ~ 10 minutes
             maxRetries: options.maxRetries || 3
         };
