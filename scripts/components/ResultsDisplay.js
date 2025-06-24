@@ -20,7 +20,7 @@
 // API configuration
 const API_BASE = typeof process !== 'undefined' && process.env && process.env.API_BASE 
     ? process.env.API_BASE 
-    : 'https://safari-today-eleven-spokesman.trycloudflare.com';
+    : 'https://dispatch-multimedia-foundation-simply.trycloudflare.com';
 
 export class ResultsDisplay {
     /**

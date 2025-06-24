@@ -197,7 +197,7 @@ Comprehensive error handling throughout the application:
 ## 🚀 Getting Started
 
 1. **Serve the files** through a web server (required for ES6 modules)
-2. **Ensure API server** is running at `https://safari-today-eleven-spokesman.trycloudflare.com`
+2. **Ensure API server** is running at `https://dispatch-multimedia-foundation-simply.trycloudflare.com`
 3. **Open** `index.html` in a supported browser
 
 ### Development Server
