@@ -28,7 +28,7 @@ export class GenerationController {
         
         // Configuration
         this.config = {
-            apiEndpoint: options.apiEndpoint || 'https://temperature-avatar-networks-audience.trycloudflare.com/generate-molecules',
+            apiEndpoint: options.apiEndpoint || 'https://safari-today-eleven-spokesman.trycloudflare.com/generate-molecules',
             timeout: options.timeout || 600000, // 600 seconds ~ 10 minutes
             maxRetries: options.maxRetries || 3
         };
