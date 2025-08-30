@@ -20,7 +20,7 @@
 // API configuration
 const API_BASE = typeof process !== 'undefined' && process.env && process.env.API_BASE 
     ? process.env.API_BASE 
-    : 'https://dispatch-multimedia-foundation-simply.trycloudflare.com';
+    : 'https://molgpt-be-2.onrender.com';
 
 export class ResultsDisplay {
     /**
